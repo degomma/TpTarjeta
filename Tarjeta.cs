@@ -6,19 +6,18 @@ public class Tarjeta
 {
     private decimal saldo;
     private const decimal limiteSaldo = 9900;
+    private const decimal limiteSaldoNegativo = -480;
 
     public Tarjeta(decimal saldoInicial = 0)
     {
         saldo = saldoInicial;
     }
 
-
     public bool TieneSaldoSuficiente(decimal monto)
     {
-        return saldo >= monto;
+        return saldo >= monto || saldo >= monto - 480;
     }
 
-    // Descuenta el saldo y muestra el nuevo saldo
     public bool DescontarSaldo(decimal monto)
     {
         if (TieneSaldoSuficiente(monto))
@@ -33,7 +32,6 @@ public class Tarjeta
             return false;
         }
     }
-
 
     public void CargarSaldo(decimal monto)
     {
@@ -53,6 +51,7 @@ public class Tarjeta
         {
             Console.WriteLine("Monto no válido para carga.");
         }
+
     }
 
     public decimal ConsultarSaldo()
