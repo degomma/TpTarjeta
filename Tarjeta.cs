@@ -12,11 +12,27 @@ public class Tarjeta
         saldo = saldoInicial;
     }
 
+
     public bool TieneSaldoSuficiente(decimal monto)
     {
         return saldo >= monto;
     }
 
+    // Descuenta el saldo y muestra el nuevo saldo
+    public bool DescontarSaldo(decimal monto)
+    {
+        if (TieneSaldoSuficiente(monto))
+        {
+            saldo -= monto;
+            Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo}");
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("Saldo insuficiente.");
+            return false;
+        }
+    }
 
 
     public void CargarSaldo(decimal monto)
