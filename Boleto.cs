@@ -20,9 +20,21 @@ public class Boleto
 
     public static Boleto EmitirSiHaySaldo(Tarjeta tarjeta, Colectivo colectivo)
     {
-        if (tarjeta.TieneSaldoSuficiente(colectivo.Tarifa))
+        decimal tarifa = colectivo.Tarifa;
+
+        if (tarjeta is FranquiciaParcial) // Aplicar descuento para Franquicia Parcial
         {
-            return new Boleto(colectivo.Tarifa, DateTime.Now);
+            tarifa /= 2; // El precio del boleto es la mitad
+        }
+        else if (tarjeta is FranquiciaCompleta) // No se descuenta nada para Franquicia Completa
+        {
+            tarifa = 0;
+        }
+
+        if (tarjeta.TieneSaldoSuficiente(tarifa))
+        {
+            tarjeta.DescontarSaldo(tarifa); // Descontar el monto de la tarjeta
+            return new Boleto(tarifa, DateTime.Now);
         }
         else
         {
