@@ -12,7 +12,4 @@ public class Colectivo
     {
         return new Boleto(tarifa, DateTime.Now);
     }
-
-  
-    }
-
+}

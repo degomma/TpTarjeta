@@ -15,7 +15,7 @@ public class Tarjeta
 
     public bool TieneSaldoSuficiente(decimal monto)
     {
-        return saldo >= monto || saldo >= monto - 480;
+        return saldo >= monto || saldo >= monto - 480; // Permite un saldo negativo de hasta $480
     }
 
     public bool DescontarSaldo(decimal monto)
@@ -51,11 +51,20 @@ public class Tarjeta
         {
             Console.WriteLine("Monto no válido para carga.");
         }
-
     }
 
     public decimal ConsultarSaldo()
     {
         return saldo;
     }
+}
+
+public class FranquiciaCompleta : Tarjeta
+{
+    public FranquiciaCompleta(decimal saldoInicial = 0) : base(saldoInicial) { }
+}
+
+public class FranquiciaParcial : Tarjeta
+{
+    public FranquiciaParcial(decimal saldoInicial = 0) : base(saldoInicial) { }
 }
