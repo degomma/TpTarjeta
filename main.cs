@@ -6,17 +6,14 @@ class MainClass
 {
     public static void Main(string[] args)
     {
-        Tarjeta miTarjeta = new Tarjeta(100); 
+        Tarjeta miTarjeta = new Tarjeta.FranquiciaParcial(500); 
         Colectivo colectivo = new Colectivo();
 
-        if (miTarjeta.DescontarSaldo(colectivo.Tarifa))
+        Boleto boleto = Boleto.EmitirSiHaySaldo(miTarjeta, colectivo, "Línea K");
+
+        if (boleto != null)
         {
-            Boleto boleto = colectivo.EmitirBoleto();
             boleto.MostrarInfo();
-        }
-        else
-        {
-            Console.WriteLine("No se puede emitir boleto. Saldo insuficiente.");
         }
     }
 }
