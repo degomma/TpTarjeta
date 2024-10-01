@@ -6,7 +6,6 @@ public class Tarjeta
 {
     private decimal saldo;
     private const decimal limiteSaldo = 9900;
-    private const decimal limiteSaldoNegativo = -480;
 
     public Tarjeta(decimal saldoInicial = 0)
     {
@@ -15,22 +14,13 @@ public class Tarjeta
 
     public bool TieneSaldoSuficiente(decimal monto)
     {
-        return saldo >= monto || saldo >= monto - 480; // Permite un saldo negativo de hasta $480
+        return saldo >= monto;
     }
 
-    public bool DescontarSaldo(decimal monto)
+    public void DescontarSaldo(decimal monto)
     {
-        if (TieneSaldoSuficiente(monto))
-        {
-            saldo -= monto;
-            Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo}");
-            return true;
-        }
-        else
-        {
-            Console.WriteLine("Saldo insuficiente.");
-            return false;
-        }
+        saldo -= monto;
+        Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo}");
     }
 
     public void CargarSaldo(decimal monto)
@@ -57,14 +47,14 @@ public class Tarjeta
     {
         return saldo;
     }
-}
 
-public class FranquiciaCompleta : Tarjeta
-{
-    public FranquiciaCompleta(decimal saldoInicial = 0) : base(saldoInicial) { }
-}
+    public class FranquiciaParcial : Tarjeta
+    {
+        public FranquiciaParcial(decimal saldoInicial) : base(saldoInicial) {}
+    }
 
-public class FranquiciaParcial : Tarjeta
-{
-    public FranquiciaParcial(decimal saldoInicial = 0) : base(saldoInicial) { }
+    public class FranquiciaCompleta : Tarjeta
+    {
+        public FranquiciaCompleta(decimal saldoInicial) : base(saldoInicial) {}
+    }
 }
