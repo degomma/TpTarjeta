@@ -60,15 +60,24 @@ public class Boleto
             tarifa = 0;
         }
 
-        if (tarjeta.TieneSaldoSuficiente(tarifa))
+        if (tarjeta.PuedeRealizarViaje(tarjeta is Tarjeta.FranquiciaCompleta))
         {
-            tarjeta.DescontarSaldo(tarifa);
-            return new Boleto(tarifa, DateTime.Now, tarjeta, lineaColectivo);
+            if (tarjeta.TieneSaldoSuficiente(tarifa))
+            {
+                tarjeta.DescontarSaldo(tarifa);
+                return new Boleto(tarifa, DateTime.Now, tarjeta, lineaColectivo);
+            }
+            else
+            {
+                Console.WriteLine("No se puede emitir boleto. Saldo insuficiente.");
+                return null;
+            }
         }
         else
         {
-            Console.WriteLine("No se puede emitir boleto. Saldo insuficiente.");
+            Console.WriteLine("No se puede emitir boleto. Restricciones de viaje no cumplidas.");
             return null;
         }
     }
+
 }

@@ -6,10 +6,14 @@ public class Tarjeta
 {
     private decimal saldo;
     private const decimal limiteSaldo = 9900;
+    private int viajesPorDia; 
+    private DateTime? ultimoViaje; 
 
     public Tarjeta(decimal saldoInicial = 0)
     {
         saldo = saldoInicial;
+        viajesPorDia = 0;
+        ultimoViaje = null;
     }
 
     public bool TieneSaldoSuficiente(decimal monto)
@@ -48,13 +52,37 @@ public class Tarjeta
         return saldo;
     }
 
+    public bool PuedeRealizarViaje(bool esFranquiciaCompleta)
+    {
+        if (this is FranquiciaParcial)
+        {
+            if (viajesPorDia < 4)
+            {
+                if (ultimoViaje.HasValue && (DateTime.Now - ultimoViaje.Value).TotalMinutes < 5)
+                {
+                    return false;
+                }
+                viajesPorDia++;
+                ultimoViaje = DateTime.Now;
+                return true;
+            }
+        }
+        else if (esFranquiciaCompleta && viajesPorDia < 2)
+        {
+            viajesPorDia++;
+            return true;
+        }
+
+        return false; 
+    }
+
     public class FranquiciaParcial : Tarjeta
     {
-        public FranquiciaParcial(decimal saldoInicial) : base(saldoInicial) {}
+        public FranquiciaParcial(decimal saldoInicial) : base(saldoInicial) { }
     }
 
     public class FranquiciaCompleta : Tarjeta
     {
-        public FranquiciaCompleta(decimal saldoInicial) : base(saldoInicial) {}
+        public FranquiciaCompleta(decimal saldoInicial) : base(saldoInicial) { }
     }
 }
