@@ -5,40 +5,58 @@ using System;
 public class Tarjeta
 {
     private decimal saldo;
-    private const decimal limiteSaldo = 9900;
-    private int viajesPorDia; 
-    private DateTime? ultimoViaje; 
+    private const decimal limiteSaldo = 36000;
+    private decimal saldoPendiente;
+    private int viajesPorDia;
+    private DateTime? ultimoViaje;
 
     public Tarjeta(decimal saldoInicial = 0)
     {
         saldo = saldoInicial;
+        saldoPendiente = 0;
         viajesPorDia = 0;
         ultimoViaje = null;
     }
 
     public bool TieneSaldoSuficiente(decimal monto)
     {
-        return saldo >= monto;
+        return saldo + saldoPendiente >= monto;
     }
 
     public void DescontarSaldo(decimal monto)
     {
-        saldo -= monto;
-        Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo}");
+        if (saldo >= monto)
+        {
+            saldo -= monto;
+        }
+        else if (saldo + saldoPendiente >= monto)
+        {
+            saldoPendiente -= (monto - saldo);
+            saldo = 0;
+        }
+        else
+        {
+            Console.WriteLine("No hay saldo suficiente para realizar la operación.");
+            return;
+        }
+        Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo}, Saldo pendiente: ${saldoPendiente}");
     }
 
     public void CargarSaldo(decimal monto)
     {
-        if (monto % 1000 == 0 && monto >= 2000 && monto <= 9000)
+        if (monto % 1000 == 0 && monto >= 2000)
         {
-            if (saldo + monto <= limiteSaldo)
+            if (saldo + saldoPendiente + monto <= limiteSaldo)
             {
                 saldo += monto;
                 Console.WriteLine($"Se cargaron ${monto}. Saldo actual: ${saldo}");
             }
             else
             {
-                Console.WriteLine("El monto excede el límite de la tarjeta.");
+                decimal cantidadAcreditada = limiteSaldo - saldo;
+                saldo += cantidadAcreditada;
+                saldoPendiente += (monto - cantidadAcreditada);
+                Console.WriteLine($"Se cargaron ${cantidadAcreditada}. Saldo actual: ${saldo}, Saldo pendiente: ${saldoPendiente}");
             }
         }
         else
@@ -52,28 +70,9 @@ public class Tarjeta
         return saldo;
     }
 
-    public bool PuedeRealizarViaje(bool esFranquiciaCompleta)
+    public decimal ConsultarSaldoPendiente()
     {
-        if (this is FranquiciaParcial)
-        {
-            if (viajesPorDia < 4)
-            {
-                if (ultimoViaje.HasValue && (DateTime.Now - ultimoViaje.Value).TotalMinutes < 5)
-                {
-                    return false;
-                }
-                viajesPorDia++;
-                ultimoViaje = DateTime.Now;
-                return true;
-            }
-        }
-        else if (esFranquiciaCompleta && viajesPorDia < 2)
-        {
-            viajesPorDia++;
-            return true;
-        }
-
-        return false; 
+        return saldoPendiente;
     }
 
     public class FranquiciaParcial : Tarjeta
