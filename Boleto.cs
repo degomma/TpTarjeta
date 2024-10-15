@@ -10,6 +10,7 @@ public class Boleto
     public string LineaColectivo { get; private set; }
     public decimal TotalAbonado { get; private set; }
     public decimal SaldoRestante { get; private set; }
+    public decimal Exceso { get; private set; }
     public string IDTarjeta { get; private set; }
     public string Descripcion { get; private set; }
 
@@ -21,6 +22,7 @@ public class Boleto
         LineaColectivo = lineaColectivo;
         TotalAbonado = tarifa;
         SaldoRestante = tarjeta.ConsultarSaldo();
+        Exceso = tarjeta.ConsultarExceso();
         IDTarjeta = tarjeta.GetHashCode().ToString();
         Descripcion = GenerarDescripcion(tarifa, tarjeta);
     }
@@ -60,7 +62,7 @@ public class Boleto
             tarifa = 0;
         }
 
-        if (tarjeta.PuedeRealizarViaje(tarjeta is Tarjeta.FranquiciaCompleta))
+        if (tarjeta.PuedeRealizarViaje())
         {
             if (tarjeta.TieneSaldoSuficiente(tarifa))
             {
