@@ -9,13 +9,17 @@ public class Tarjeta
     private int viajesPorDia;
     private DateTime ultimoViaje;
     private const int maxViajesPorDia = 2;
-    private Decimal exceso;
-    
+    private decimal exceso;
+    private int viajesMensuales;
+    private DateTime inicioMes;
+
     public Tarjeta(decimal saldoInicial = 0)
     {
         saldo = saldoInicial;
         viajesPorDia = 0;
         ultimoViaje = DateTime.MinValue;
+        viajesMensuales = 0;
+        inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
     }
 
     public bool TieneSaldoSuficiente(decimal monto)
@@ -26,9 +30,9 @@ public class Tarjeta
     public void DescontarSaldo(decimal monto)
     {
         saldo -= monto;
-        var saldoexceso=AgregarExceso(saldo,exceso);
-        saldo=saldoexceso.Item1;
-        exceso=saldoexceso.Item2;
+        var saldoexceso = AgregarExceso(saldo, exceso);
+        saldo = saldoexceso.Item1;
+        exceso = saldoexceso.Item2;
         Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo} Excedente: ${exceso} (pendiente de acreditación)");
         RegistrarViaje();
     }
@@ -63,58 +67,77 @@ public class Tarjeta
         return exceso;
     }
 
-    public Tuple<decimal, decimal> AgregarExceso(decimal saldo, decimal exceso){
-        if((saldo+exceso)<=limiteSaldo){
-            saldo+=exceso;
-            exceso=0;
+    public Tuple<decimal, decimal> AgregarExceso(decimal saldo, decimal exceso)
+    {
+        if ((saldo + exceso) <= limiteSaldo)
+        {
+            saldo += exceso;
+            exceso = 0;
         }
-        else{
-            exceso=(saldo+exceso)-limiteSaldo;
-            saldo=limiteSaldo;
+        else
+        {
+            exceso = (saldo + exceso) - limiteSaldo;
+            saldo = limiteSaldo;
         }
-        var tuple = new Tuple<decimal, decimal>(saldo,exceso);
+        var tuple = new Tuple<decimal, decimal>(saldo, exceso);
         return tuple;
     }
-    
-  
+
     public bool PuedeRealizarViaje()
     {
-        if (this is FranquiciaParcial){
+        if (this is FranquiciaParcial)
+        {
             if (DateTime.Now - ultimoViaje < TimeSpan.FromSeconds(300))
             {
                 return false;
             }
-        
-            else{
-                return true;
-            }
-            }
-        if (this is FranquiciaCompleta){
-            if(viajesPorDia>=maxViajesPorDia){
-                return false;
-            }
-            else{
+            else
+            {
                 return true;
             }
         }
-        else{
-        return true;
+        if (this is FranquiciaCompleta)
+        {
+            if (viajesPorDia >= maxViajesPorDia)
+            {
+                return false;
             }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public void RegistrarViaje()
     {
+        if (DateTime.Now.Month != inicioMes.Month || DateTime.Now.Year != inicioMes.Year)
+        {
+            inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            viajesMensuales = 0;
+        }
+
         ultimoViaje = DateTime.Now;
         viajesPorDia++;
+        viajesMensuales++;
+    }
+
+    public int ConsultarViajesMensuales()
+    {
+        return viajesMensuales;
     }
 
     public class FranquiciaParcial : Tarjeta
     {
-        public FranquiciaParcial(decimal saldoInicial) : base(saldoInicial) {}
+        public FranquiciaParcial(decimal saldoInicial) : base(saldoInicial) { }
     }
 
     public class FranquiciaCompleta : Tarjeta
     {
-        public FranquiciaCompleta(decimal saldoInicial) : base(saldoInicial) {}
+        public FranquiciaCompleta(decimal saldoInicial) : base(saldoInicial) { }
     }
 }
