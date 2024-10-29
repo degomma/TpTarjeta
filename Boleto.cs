@@ -53,13 +53,19 @@ public class Boleto
     {
         decimal tarifa = colectivo.Tarifa;
 
-        if (tarjeta is Tarjeta.FranquiciaParcial)
+
+        if (tarjeta is Tarjeta && !(tarjeta is Tarjeta.FranquiciaParcial) && !(tarjeta is Tarjeta.FranquiciaCompleta))
         {
-            tarifa /= 2;
-        }
-        else if (tarjeta is Tarjeta.FranquiciaCompleta)
-        {
-            tarifa = 0;
+            int viajesMensuales = tarjeta.ConsultarViajesMensuales();
+
+            if (viajesMensuales >= 30 && viajesMensuales <= 79)
+            {
+                tarifa *= 0.8M;
+            }
+            else if (viajesMensuales >= 80 && viajesMensuales <= 81)
+            {
+                tarifa *= 0.75M;
+            }
         }
 
         if (tarjeta.PuedeRealizarViaje())
@@ -81,5 +87,4 @@ public class Boleto
             return null;
         }
     }
-
 }
