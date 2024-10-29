@@ -53,37 +53,35 @@ public class Boleto
     {
         decimal tarifa = colectivo.Tarifa;
 
-
-        if (tarjeta is Tarjeta && !(tarjeta is Tarjeta.FranquiciaParcial) && !(tarjeta is Tarjeta.FranquiciaCompleta))
+        if (tarjeta is Tarjeta.FranquiciaParcial)
+        {
+            tarifa /= 2;
+        }
+        else if (tarjeta is Tarjeta.FranquiciaCompleta)
+        {
+            tarifa = 0;
+        }
+        else
         {
             int viajesMensuales = tarjeta.ConsultarViajesMensuales();
-
-            if (viajesMensuales >= 30 && viajesMensuales <= 79)
+            if (viajesMensuales >= 30 && viajesMensuales < 80)
             {
                 tarifa *= 0.8M;
             }
-            else if (viajesMensuales >= 80 && viajesMensuales <= 81)
+            else if (viajesMensuales >= 80 && viajesMensuales <= 100)
             {
                 tarifa *= 0.75M;
             }
         }
 
-        if (tarjeta.PuedeRealizarViaje())
+        if (tarjeta.PuedeRealizarViaje() && tarjeta.TieneSaldoSuficiente(tarifa))
         {
-            if (tarjeta.TieneSaldoSuficiente(tarifa))
-            {
-                tarjeta.DescontarSaldo(tarifa);
-                return new Boleto(tarifa, DateTime.Now, tarjeta, lineaColectivo);
-            }
-            else
-            {
-                Console.WriteLine("No se puede emitir boleto. Saldo insuficiente.");
-                return null;
-            }
+            tarjeta.DescontarSaldo(tarifa);
+            return new Boleto(tarifa, DateTime.Now, tarjeta, lineaColectivo);
         }
         else
         {
-            Console.WriteLine("No se puede emitir boleto. Restricciones de viaje no cumplidas.");
+            Console.WriteLine("No se puede emitir boleto. Restricciones de viaje o saldo insuficiente.");
             return null;
         }
     }
