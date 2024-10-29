@@ -17,9 +17,9 @@ public class Tarjeta
     {
         saldo = saldoInicial;
         viajesPorDia = 0;
-        ultimoViaje = DateTime.MinValue;
         viajesMensuales = 0;
         inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        ultimoViaje = DateTime.MinValue;
     }
 
     public bool TieneSaldoSuficiente(decimal monto)
@@ -30,9 +30,9 @@ public class Tarjeta
     public void DescontarSaldo(decimal monto)
     {
         saldo -= monto;
-        var saldoexceso = AgregarExceso(saldo, exceso);
-        saldo = saldoexceso.Item1;
-        exceso = saldoexceso.Item2;
+        var saldoExceso = AgregarExceso(saldo, exceso);
+        saldo = saldoExceso.Item1;
+        exceso = saldoExceso.Item2;
         Console.WriteLine($"Se descontaron ${monto}. Saldo restante: ${saldo} Excedente: ${exceso} (pendiente de acreditación)");
         RegistrarViaje();
     }
@@ -79,51 +79,56 @@ public class Tarjeta
             exceso = (saldo + exceso) - limiteSaldo;
             saldo = limiteSaldo;
         }
-        var tuple = new Tuple<decimal, decimal>(saldo, exceso);
-        return tuple;
+        return new Tuple<decimal, decimal>(saldo, exceso);
     }
 
     public bool PuedeRealizarViaje()
     {
-        if (this is FranquiciaParcial)
+        if (this is FranquiciaParcial || this is FranquiciaCompleta)
         {
-            if (DateTime.Now - ultimoViaje < TimeSpan.FromSeconds(300))
+            if (!EstaEnHorarioPermitido() || !EsDiaPermitido())
             {
+                Console.WriteLine("Viaje no permitido fuera de horario o día habilitado para esta franquicia.");
                 return false;
             }
-            else
-            {
-                return true;
-            }
         }
-        if (this is FranquiciaCompleta)
+
+        if (this is FranquiciaParcial && DateTime.Now - ultimoViaje < TimeSpan.FromSeconds(300))
         {
-            if (viajesPorDia >= maxViajesPorDia)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return false;
         }
-        else
+
+        if (this is FranquiciaCompleta && viajesPorDia >= maxViajesPorDia)
         {
-            return true;
+            return false;
         }
+
+        return true;
     }
 
     public void RegistrarViaje()
     {
-        if (DateTime.Now.Month != inicioMes.Month || DateTime.Now.Year != inicioMes.Year)
-        {
-            inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            viajesMensuales = 0;
-        }
-
         ultimoViaje = DateTime.Now;
         viajesPorDia++;
+
+        if (DateTime.Now.Month != inicioMes.Month)
+        {
+            viajesMensuales = 0;
+            inicioMes = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        }
         viajesMensuales++;
+    }
+
+    private bool EstaEnHorarioPermitido()
+    {
+        int hora = DateTime.Now.Hour;
+        return hora >= 6 && hora < 22;
+    }
+
+    private bool EsDiaPermitido()
+    {
+        DayOfWeek dia = DateTime.Now.DayOfWeek;
+        return dia >= DayOfWeek.Monday && dia <= DayOfWeek.Friday;
     }
 
     public int ConsultarViajesMensuales()
