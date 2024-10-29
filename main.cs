@@ -10,18 +10,16 @@ class MainClass
 
         if (miTarjeta == null)
         {
-            Console.WriteLine("Tipo de tarjeta no valido.");
+            Console.WriteLine("Tipo de tarjeta no válido.");
             return;
         }
-
-        Colectivo colectivo = new Colectivo();
 
         while (true)
         {
             Console.WriteLine("1. Cargar saldo");
             Console.WriteLine("2. Pagar boleto");
             Console.WriteLine("3. Salir");
-            Console.Write("Seleccione una opcion: ");
+            Console.Write("Seleccione una opción: ");
             string opcion = Console.ReadLine();
 
             switch (opcion)
@@ -34,20 +32,43 @@ class MainClass
                     }
                     else
                     {
-                        Console.WriteLine("Monto no valido.");
+                        Console.WriteLine("Monto no válido.");
                     }
                     break;
+
                 case "2":
+                    Console.WriteLine("Seleccione el tipo de colectivo:");
+                    Console.WriteLine("1. Normal");
+                    Console.WriteLine("2. Interurbano");
+                    string tipoColectivo = Console.ReadLine();
+                    Colectivo colectivo;
+
+                    if (tipoColectivo == "1")
+                    {
+                        colectivo = new Colectivo();
+                    }
+                    else if (tipoColectivo == "2")
+                    {
+                        colectivo = new ColectivoInterurbano();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Tipo de colectivo no válido.");
+                        continue;
+                    }
+
                     Boleto boleto = Boleto.EmitirSiHaySaldo(miTarjeta, colectivo, "Línea K");
                     if (boleto != null)
                     {
                         boleto.MostrarInfo();
                     }
                     break;
+
                 case "3":
                     return;
+
                 default:
-                    Console.WriteLine("Opción no valida. Intente nuevamente.");
+                    Console.WriteLine("Opción no válida. Intente nuevamente.");
                     break;
             }
         }
