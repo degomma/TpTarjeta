@@ -142,14 +142,4 @@ public class Tarjeta
     {
         saldo = nuevoSaldo;
     }
-
-    public class FranquiciaParcial : Tarjeta
-    {
-        public FranquiciaParcial(decimal saldoInicial) : base(saldoInicial) { }
-    }
-
-    public class FranquiciaCompleta : Tarjeta
-    {
-        public FranquiciaCompleta(decimal saldoInicial) : base(saldoInicial) { }
-    }
 }

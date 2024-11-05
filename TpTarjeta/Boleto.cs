@@ -53,11 +53,11 @@ public class Boleto
     {
         decimal tarifa = colectivo.Tarifa;
 
-        if (tarjeta is Tarjeta.FranquiciaParcial)
+        if (tarjeta is FranquiciaParcial)
         {
             tarifa /= 2;
         }
-        else if (tarjeta is Tarjeta.FranquiciaCompleta)
+        else if (tarjeta is FranquiciaCompleta)
         {
             if (tarjeta.ConsultarViajesMensuales() >= 2)
             {
@@ -75,7 +75,7 @@ public class Boleto
             {
                 tarifa *= 0.8M;
             }
-            else if (viajesMensuales >= 79 && viajesMensuales <=80 )
+            else if (viajesMensuales >= 79 && viajesMensuales <= 80)
             {
                 tarifa *= 0.75M;
             }
